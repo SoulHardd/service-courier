@@ -4,6 +4,7 @@ import (
 	"avito/internal/config"
 	"avito/internal/handlers"
 	"avito/internal/handlers/courier"
+	"avito/internal/handlers/delivery"
 	"errors"
 	"fmt"
 	"log"
@@ -20,7 +21,7 @@ type Server struct {
 	db      *pgxpool.Pool
 }
 
-func New(cfg *config.ServerConfig, pool *pgxpool.Pool, courier *courier.CourierController) *Server {
+func New(cfg *config.ServerConfig, pool *pgxpool.Pool, courier *courier.CourierController, delivery *delivery.DeliveryController) *Server {
 	r := chi.NewRouter()
 	s := &Server{
 		HttpSrv: &http.Server{
@@ -31,7 +32,7 @@ func New(cfg *config.ServerConfig, pool *pgxpool.Pool, courier *courier.CourierC
 		cfg: cfg,
 		db:  pool,
 	}
-	s.setRoutes(courier)
+	s.setRoutes(courier, delivery)
 	return s
 }
 
@@ -44,7 +45,7 @@ func (s *Server) ListenAndServe() {
 	}()
 }
 
-func (s *Server) setRoutes(courier *courier.CourierController) {
+func (s *Server) setRoutes(courier *courier.CourierController, delivery *delivery.DeliveryController) {
 	s.r.Get("/ping", handlers.Ping)
 	s.r.Head("/healthcheck", handlers.HealthCheck)
 	s.r.Get("/couriers", courier.GetAll)
@@ -52,5 +53,9 @@ func (s *Server) setRoutes(courier *courier.CourierController) {
 		r.Get("/{id}", courier.Get)
 		r.Post("/", courier.Create)
 		r.Put("/", courier.Update)
+	})
+	s.r.Route("/delivery", func(r chi.Router) {
+		r.Post("/assign", delivery.Create)
+		r.Post("/unassign", delivery.Delete)
 	})
 }

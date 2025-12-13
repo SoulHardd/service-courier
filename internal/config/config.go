@@ -13,14 +13,16 @@ import (
 type Config struct {
 	ServerCfg   *ServerConfig
 	DatabaseCfg *DatabaseConfig
+	TimeCfg     *TimeConfig
 }
 
 type ServerConfig struct {
 	Port int `env:"PORT" env-default:"8080" validate:"required,gt=0,lt=65536"`
 }
 
-type TimeoutConfig struct {
-	Shutdown time.Duration `env:"SHUTDOWN_TIMEOUT" env-default:"30s"`
+type TimeConfig struct {
+	ShutdownTimeout         time.Duration `env:"SHUTDOWN_TIMEOUT" env-default:"30s"`
+	DeliveryMonitorInterval time.Duration `env:"DELIVERY_MONITOR_INTERVAL" env-default:"10s"`
 }
 
 type DatabaseConfig struct {
@@ -47,14 +49,17 @@ func MustLoad() *Config {
 	cfg := &Config{
 		ServerCfg:   &ServerConfig{},
 		DatabaseCfg: &DatabaseConfig{},
+		TimeCfg:     &TimeConfig{},
 	}
 
 	if err := cleanenv.ReadEnv(cfg.ServerCfg); err != nil {
 		log.Fatalf("Failed to load server config: %v", err)
 	}
-
 	if err := cleanenv.ReadEnv(cfg.DatabaseCfg); err != nil {
 		log.Fatalf("Failed to load database config: %v", err)
+	}
+	if err := cleanenv.ReadEnv(cfg.TimeCfg); err != nil {
+		log.Fatalf("Failed to load time config: %v", err)
 	}
 
 	if port != 0 {

@@ -2,11 +2,11 @@ package courier
 
 import (
 	"avito/internal/domain"
-	"avito/internal/model"
 	"context"
 	"errors"
 	"fmt"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -22,58 +22,72 @@ func New(pool *pgxpool.Pool) *CourierRepository {
 	}
 }
 
-func (r *CourierRepository) GetOneById(ctx context.Context, id int64) (*model.Courier, error) {
-	var courier model.CourierDB
+func (r *CourierRepository) GetOneById(ctx context.Context, id int64) (*domain.Courier, error) {
+	var courier CourierDB
 
-	err := r.pool.QueryRow(ctx,
-		"SELECT id, name, phone, status FROM couriers WHERE id=$1",
-		id).Scan(
+	query, args, _ := squirrel.
+		Select("id", "name", "phone", "status", "transport_type").
+		From("couriers").
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	err := r.pool.QueryRow(ctx, query, args...).Scan(
 		&courier.ID,
 		&courier.Name,
 		&courier.Phone,
 		&courier.Status,
+		&courier.TransportType,
 	)
+
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.ErrCourierNotFound
 		}
 		return nil, fmt.Errorf("database error: %w", err)
 	}
-	return &model.Courier{
-		ID:     courier.ID,
-		Name:   courier.Name,
-		Phone:  courier.Phone,
-		Status: courier.Status,
+	return &domain.Courier{
+		ID:            courier.ID,
+		Name:          courier.Name,
+		Phone:         courier.Phone,
+		Status:        courier.Status,
+		TransportType: courier.TransportType,
 	}, nil
 }
 
-func (r *CourierRepository) GetAll(ctx context.Context) ([]model.Courier, error) {
+func (r *CourierRepository) GetAll(ctx context.Context) ([]domain.Courier, error) {
 
-	rows, err := r.pool.Query(ctx, "SELECT id, name, phone, status FROM couriers ORDER BY id")
+	query, args, _ := squirrel.
+		Select("id", "name", "status", "transport_type").
+		From("couriers").
+		OrderBy("id ASC").
+		ToSql()
+
+	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("database error: %w", err)
 	}
 	defer rows.Close()
 
-	var couriers []model.Courier
+	var couriers []domain.Courier
 
 	for rows.Next() {
-		var courier model.CourierDB
+		var courier CourierDB
 
 		err := rows.Scan(
 			&courier.ID,
 			&courier.Name,
-			&courier.Phone,
 			&courier.Status,
+			&courier.TransportType,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("database error: %w", err)
 		}
-		couriers = append(couriers, model.Courier{
-			ID:     courier.ID,
-			Name:   courier.Name,
-			Phone:  courier.Phone,
-			Status: courier.Status,
+		couriers = append(couriers, domain.Courier{
+			ID:            courier.ID,
+			Name:          courier.Name,
+			Status:        courier.Status,
+			TransportType: courier.TransportType,
 		})
 	}
 
@@ -84,18 +98,25 @@ func (r *CourierRepository) GetAll(ctx context.Context) ([]model.Courier, error)
 	return couriers, nil
 }
 
-func (r *CourierRepository) Create(ctx context.Context, courier *model.Courier) (int64, error) {
+func (r *CourierRepository) Create(ctx context.Context, courier *domain.Courier) (int64, error) {
 	var id int64
 
-	courierDB := model.CourierDB{
-		Name:   courier.Name,
-		Phone:  courier.Phone,
-		Status: courier.Status,
+	courierDB := CourierDB{
+		Name:          courier.Name,
+		Phone:         courier.Phone,
+		Status:        courier.Status,
+		TransportType: courier.TransportType,
 	}
 
-	err := r.pool.QueryRow(ctx,
-		"INSERT INTO couriers (name, phone, status) VALUES ($1, $2, $3) RETURNING id",
-		courierDB.Name, courierDB.Phone, courierDB.Status).Scan(&id)
+	query, args, _ := squirrel.
+		Insert("couriers").
+		Columns("name", "phone", "status", "transport_type").
+		Values(courierDB.Name, courierDB.Phone, courierDB.Status, courierDB.TransportType).
+		Suffix("RETURNING id").
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	err := r.pool.QueryRow(ctx, query, args...).Scan(&id)
 
 	const duplicateKeyCode = "23505"
 	if err != nil {
@@ -107,16 +128,27 @@ func (r *CourierRepository) Create(ctx context.Context, courier *model.Courier) 
 	return id, nil
 }
 
-func (r *CourierRepository) Update(ctx context.Context, courier *model.Courier) error {
-	courierDB := model.CourierDB{
-		ID:     courier.ID,
-		Name:   courier.Name,
-		Phone:  courier.Phone,
-		Status: courier.Status,
+func (r *CourierRepository) Update(ctx context.Context, courier *domain.Courier) error {
+	courierDB := CourierDB{
+		ID:            courier.ID,
+		Name:          courier.Name,
+		Phone:         courier.Phone,
+		Status:        courier.Status,
+		TransportType: courier.TransportType,
 	}
 
-	result, err := r.pool.Exec(ctx, "UPDATE couriers SET name=$1, phone=$2, status=$3, updated_at=NOW() WHERE id=$4",
-		courierDB.Name, courierDB.Phone, courierDB.Status, courierDB.ID)
+	query, args, _ := squirrel.
+		Update("couriers").
+		Set("name", courierDB.Name).
+		Set("phone", courier.Phone).
+		Set("status", courierDB.Status).
+		Set("transport_type", courier.TransportType).
+		Set("updated_at", squirrel.Expr("NOW()")).
+		Where(squirrel.Eq{"id": courier.ID}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	result, err := r.pool.Exec(ctx, query, args...)
 
 	const duplicateKeyCode = "23505"
 	if err != nil {
@@ -130,4 +162,42 @@ func (r *CourierRepository) Update(ctx context.Context, courier *model.Courier) 
 		return domain.ErrCourierNotFound
 	}
 	return nil
+}
+
+func (r *CourierRepository) GetOneForDelivery(ctx context.Context) (*domain.Courier, error) {
+
+	query, args, _ := squirrel.
+		Select("c.id", "c.name", "c.phone", "c.status", "c.transport_type").
+		From("couriers c").
+		LeftJoin("delivery d ON c.id = d.courier_id AND d.deadline < NOW()").
+		Where(squirrel.Eq{"c.status": string(domain.CourierStatusAvailable)}).
+		GroupBy("c.id", "c.name", "c.phone", "c.status", "c.transport_type").
+		OrderBy("COUNT(d.id) ASC", "c.id ASC").
+		Limit(1).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	var courier CourierDB
+	err := r.pool.QueryRow(ctx, query, args...).Scan(
+		&courier.ID,
+		&courier.Name,
+		&courier.Phone,
+		&courier.Status,
+		&courier.TransportType,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrNoAvailableCouriers
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	return &domain.Courier{
+		ID:            courier.ID,
+		Name:          courier.Name,
+		Phone:         courier.Phone,
+		Status:        courier.Status,
+		TransportType: courier.TransportType,
+	}, nil
 }

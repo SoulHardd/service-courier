@@ -2,7 +2,6 @@ package courier
 
 import (
 	"avito/internal/domain"
-	"avito/internal/model"
 	"context"
 	"errors"
 	"regexp"
@@ -16,7 +15,7 @@ func New(repository CourierRepository) *CourierUseCase {
 	return &CourierUseCase{repository: repository}
 }
 
-func (u *CourierUseCase) GetCourier(ctx context.Context, id int64) (*model.Courier, error) {
+func (u *CourierUseCase) GetCourier(ctx context.Context, id int64) (*domain.Courier, error) {
 	courier, err := u.repository.GetOneById(ctx, id)
 
 	if err != nil {
@@ -29,11 +28,11 @@ func (u *CourierUseCase) GetCourier(ctx context.Context, id int64) (*model.Couri
 	return courier, nil
 }
 
-func (u *CourierUseCase) GetCouriers(ctx context.Context) ([]model.Courier, error) {
+func (u *CourierUseCase) GetCouriers(ctx context.Context) ([]domain.Courier, error) {
 	return u.repository.GetAll(ctx)
 }
 
-func (u *CourierUseCase) CreateCourier(ctx context.Context, req *model.Courier) (int64, error) {
+func (u *CourierUseCase) CreateCourier(ctx context.Context, req *domain.Courier) (int64, error) {
 	if req.Name == "" || req.Phone == "" || req.Status == "" {
 		return 0, domain.ErrMissingRequiredFields
 	}
@@ -54,7 +53,7 @@ func (u *CourierUseCase) CreateCourier(ctx context.Context, req *model.Courier) 
 	return id, nil
 }
 
-func (u *CourierUseCase) UpdateCourier(ctx context.Context, req *model.Courier) error {
+func (u *CourierUseCase) UpdateCourier(ctx context.Context, req *domain.Courier) error {
 	if req.Name == "" || req.Phone == "" || req.Status == "" {
 		return domain.ErrMissingRequiredFields
 	}

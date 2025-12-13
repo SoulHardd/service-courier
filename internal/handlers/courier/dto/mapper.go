@@ -1,37 +1,47 @@
 package dto
 
-import "avito/internal/model"
+import (
+	"avito/internal/domain"
+)
 
-func ToCourierResponse(c model.Courier) CourierResponse {
+func ToCourierResponse(c domain.Courier) CourierResponse {
 	return CourierResponse{
-		ID:     c.ID,
-		Name:   c.Name,
-		Phone:  c.Phone,
-		Status: c.Status,
+		ID:            c.ID,
+		Name:          c.Name,
+		Phone:         c.Phone,
+		Status:        c.Status,
+		TransportType: c.TransportType,
 	}
 }
 
-func ToCourierResponses(list []model.Courier) []CourierResponse {
-	res := make([]CourierResponse, len(list))
+func ToCourierResponses(list []domain.Courier) []CourierResponses {
+	res := make([]CourierResponses, len(list))
 	for i, c := range list {
-		res[i] = ToCourierResponse(c)
+		res[i] = CourierResponses{
+			ID:            c.ID,
+			Name:          c.Name,
+			Status:        c.Status,
+			TransportType: c.TransportType,
+		}
 	}
 	return res
 }
 
-func ToModelCreate(req *CourierCreateRequest) model.Courier {
-	return model.Courier{
-		Name:   req.Name,
-		Phone:  req.Phone,
-		Status: req.Status,
+func ToModelCreate(req *CourierCreateRequest) domain.Courier {
+	return domain.Courier{
+		Name:          req.Name,
+		Phone:         req.Phone,
+		Status:        req.Status,
+		TransportType: req.TransportType,
 	}
 }
 
-func ToModelUpdate(req *CourierUpdateRequest) model.Courier {
-	return model.Courier{
-		ID:     req.ID,
-		Name:   req.Name,
-		Phone:  req.Phone,
-		Status: req.Status,
+func ToModelUpdate(req *CourierUpdateRequest) domain.Courier {
+	return domain.Courier{
+		ID:            req.ID,
+		Name:          req.Name,
+		Phone:         req.Phone,
+		Status:        req.Status,
+		TransportType: req.TransportType,
 	}
 }
