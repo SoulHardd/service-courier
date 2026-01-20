@@ -77,6 +77,17 @@ func (u *CourierUseCase) UpdateCourier(ctx context.Context, req *domain.Courier)
 	return nil
 }
 
+func (u *CourierUseCase) ReleaseCourierByOrderId(ctx context.Context, orderId string) error {
+	err := u.repository.ReleaseOneByOrderId(ctx, orderId)
+	if err != nil {
+		if errors.Is(err, domain.ErrDeliveryNotFound) {
+			return domain.ErrDeliveryNotFound
+		}
+		return err
+	}
+	return nil
+}
+
 var phoneRegex = regexp.MustCompile(`^\+\d{11}$`)
 
 func validatePhoneNumber(phone string) bool {

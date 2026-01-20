@@ -12,4 +12,5 @@ type CourierRepository interface {
 	Create(ctx context.Context, courier *domain.Courier) (int64, error)
 	Update(ctx context.Context, courier *domain.Courier) error
 	GetOneForDelivery(ctx context.Context) (*domain.Courier, error)
+	ReleaseOneByOrderId(ctx context.Context, orderId string) error
 }

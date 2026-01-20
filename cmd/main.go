@@ -2,18 +2,26 @@ package main
 
 import (
 	"avito/internal/config"
-	courierHandler "avito/internal/handlers/courier"
-	deliveryHandler "avito/internal/handlers/delivery"
+	"avito/internal/gateway/order"
+	courierHandler "avito/internal/handlers/http/courier"
+	deliveryHandler "avito/internal/handlers/http/delivery"
+	"avito/internal/logger"
 	courierRepo "avito/internal/repository/courier"
 	deliveryRepo "avito/internal/repository/delivery"
 	"avito/internal/server"
 	"avito/internal/useCase/courier"
 	"avito/internal/useCase/delivery"
+	"avito/internal/worker"
 	"avito/pkg/connections"
+	pb "avito/proto/order"
 	"context"
 	"log"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -34,9 +42,22 @@ func main() {
 	deliveryUseCase := delivery.New(deliveryRepository, courierRepository)
 	deliveryController := deliveryHandler.New(deliveryUseCase)
 
-	srv := server.New(cfg.ServerCfg, pool, courierController, deliveryController)
+	zapLogger, _ := zap.NewProduction()
+	defer zapLogger.Sync()
+	lg := logger.NewZapLogger(zapLogger)
+	srv := server.New(cfg.ServerCfg, pool, courierController, deliveryController, lg)
 
 	deliveryUseCase.StartMonitorDeliveries(appCtx, cfg.TimeCfg.DeliveryMonitorInterval)
+
+	conn, err := grpc.NewClient(cfg.GrpcCfg.OrderServiceGrpc, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to gRPC server: %v", err)
+	}
+	defer conn.Close()
+	o := pb.NewOrdersServiceClient(conn)
+	orderGateway := order.NewGateway(o)
+	orderWorker := worker.New(orderGateway, deliveryUseCase, cfg.TimeCfg.OrderWorkerInterval)
+	orderWorker.Run(appCtx)
 
 	srv.ListenAndServe()
 

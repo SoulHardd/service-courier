@@ -14,6 +14,8 @@ type Config struct {
 	ServerCfg   *ServerConfig
 	DatabaseCfg *DatabaseConfig
 	TimeCfg     *TimeConfig
+	GrpcCfg     *GrpcConfig
+	KafkaCfg    *KafkaConfig
 }
 
 type ServerConfig struct {
@@ -23,6 +25,7 @@ type ServerConfig struct {
 type TimeConfig struct {
 	ShutdownTimeout         time.Duration `env:"SHUTDOWN_TIMEOUT" env-default:"30s"`
 	DeliveryMonitorInterval time.Duration `env:"DELIVERY_MONITOR_INTERVAL" env-default:"10s"`
+	OrderWorkerInterval     time.Duration `env:"ORDER_WORKER_INTERVAL" env-default:"5s"`
 }
 
 type DatabaseConfig struct {
@@ -38,6 +41,20 @@ type DatabaseConfig struct {
 	RetryAttempts   int           `env:"POSTGRES_RETRY_ATTEMPTS" env-default:"5"`
 }
 
+type GrpcConfig struct {
+	OrderServiceGrpc string `env:"ORDER_SERVICE_GRPC"`
+}
+
+type KafkaConfig struct {
+	Brokers            []string      `env:"KAFKA_BROKERS"`
+	GroupId            string        `env:"KAFKA_GROUP_ID"`
+	OrderTopic         string        `env:"KAFKA_ORDER_TOPIC"`
+	Version            string        `env:"KAFKA_VERSION" env-default:"2.1.0"`
+	InitialOffset      string        `env:"KAFKA_INITIAL_OFFSET" env-default:"oldest"`
+	AutoCommitEnable   bool          `env:"KAFKA_AUTO_COMMIT_ENABLE" env-default:"true"`
+	AutoCommitInterval time.Duration `env:"KAFKA_AUTO_COMMIT_INTERVAL" env-default:"1s"`
+}
+
 func MustLoad() *Config {
 	var port int
 	pflag.IntVar(&port, "port", 0, "HTTP server port")
@@ -50,6 +67,8 @@ func MustLoad() *Config {
 		ServerCfg:   &ServerConfig{},
 		DatabaseCfg: &DatabaseConfig{},
 		TimeCfg:     &TimeConfig{},
+		GrpcCfg:     &GrpcConfig{},
+		KafkaCfg:    &KafkaConfig{},
 	}
 
 	if err := cleanenv.ReadEnv(cfg.ServerCfg); err != nil {
@@ -60,6 +79,12 @@ func MustLoad() *Config {
 	}
 	if err := cleanenv.ReadEnv(cfg.TimeCfg); err != nil {
 		log.Fatalf("Failed to load time config: %v", err)
+	}
+	if err := cleanenv.ReadEnv(cfg.GrpcCfg); err != nil {
+		log.Fatalf("Failed to load grpc config: %v", err)
+	}
+	if err := cleanenv.ReadEnv(cfg.KafkaCfg); err != nil {
+		log.Fatalf("Failed to load kafka config: %v", err)
 	}
 
 	if port != 0 {

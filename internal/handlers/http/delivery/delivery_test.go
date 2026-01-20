@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"avito/internal/domain"
-	"avito/internal/handlers/delivery/dto"
+	"avito/internal/handlers/http/delivery/dto"
 	"avito/mocks/usecase"
 	"bytes"
 	"encoding/json"

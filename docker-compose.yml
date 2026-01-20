@@ -1,19 +1,80 @@
-version: '3'
+version: '3.7'
 
 services:
   postgres:
-    image: postgres:15            # Официальный образ PostgreSQL
-    container_name: my-postgres   # Имя контейнера
+    image: postgres:15
+    container_name: my-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}          # Имя пользователя БД (берем из .env)
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Пароль (берем из .env)
-      POSTGRES_DB: ${POSTGRES_DB}              # База данных, создаваемая при запуске (берем из .env)
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - pgdata:/var/lib/postgresql/data        # Хранилище данных
+      - pgdata:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d/migrations:ro
     ports:
-      - "${POSTGRES_PORT}:5432"                # Проброс порта: хост:контейнер (хост берем из .env)
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - infrastructure_default
+
+  service-courier:
+    build:
+      context: .
+      dockerfile: courier.Dockerfile
+    ports:
+      - "8082:8080"
+    env_file:
+      - .env
+    environment:
+      - PORT=${LOCALHOST}
+      - ORDER_SERVICE_HOST=${ORDER_SERVICE_HOST}
+    networks:
+      - infrastructure_default
+
+  service-courier-worker:
+    build:
+      context: .
+      dockerfile: worker.Dockerfile
+    container_name: service-courier-worker
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - service-courier
+    networks:
+      - infrastructure_default
+
+  prometheus:
+    image: prom/prometheus
+    ports: [ "9090:9090" ]
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "prometheus-data:/prometheus"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: [ "3000:3000" ]
+    volumes:
+      - "grafana-data:/var/lib/grafana"
+    networks:
+      - monitoring
+
+  go-app:
+    build:
+      context: .
+      dockerfile: metrics.Dockerfile
+    ports: [ "2112:2112" ]
+    networks:
+      - monitoring
 
 volumes:
-  pgdata:                         # Объявление Named Volume
+  pgdata:
+  prometheus-data:
+  grafana-data:
 
+networks:
+  infrastructure_default:
+    external: true
+  monitoring:
+    driver: bridge

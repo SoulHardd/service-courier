@@ -5,7 +5,7 @@
 package repository
 
 import (
-	model "avito/internal/domain"
+	domain "avito/internal/domain"
 	context "context"
 	reflect "reflect"
 
@@ -36,7 +36,7 @@ func (m *MockCourierRepository) EXPECT() *MockCourierRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockCourierRepository) Create(ctx context.Context, courier *model.Courier) (int64, error) {
+func (m *MockCourierRepository) Create(ctx context.Context, courier *domain.Courier) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, courier)
 	ret0, _ := ret[0].(int64)
@@ -51,10 +51,10 @@ func (mr *MockCourierRepositoryMockRecorder) Create(ctx, courier interface{}) *g
 }
 
 // GetAll mocks base method.
-func (m *MockCourierRepository) GetAll(ctx context.Context) ([]model.Courier, error) {
+func (m *MockCourierRepository) GetAll(ctx context.Context) ([]domain.Courier, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx)
-	ret0, _ := ret[0].([]model.Courier)
+	ret0, _ := ret[0].([]domain.Courier)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,10 +66,10 @@ func (mr *MockCourierRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Cal
 }
 
 // GetOneById mocks base method.
-func (m *MockCourierRepository) GetOneById(ctx context.Context, id int64) (*model.Courier, error) {
+func (m *MockCourierRepository) GetOneById(ctx context.Context, id int64) (*domain.Courier, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOneById", ctx, id)
-	ret0, _ := ret[0].(*model.Courier)
+	ret0, _ := ret[0].(*domain.Courier)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockCourierRepositoryMockRecorder) GetOneById(ctx, id interface{}) *go
 }
 
 // GetOneForDelivery mocks base method.
-func (m *MockCourierRepository) GetOneForDelivery(ctx context.Context) (*model.Courier, error) {
+func (m *MockCourierRepository) GetOneForDelivery(ctx context.Context) (*domain.Courier, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOneForDelivery", ctx)
-	ret0, _ := ret[0].(*model.Courier)
+	ret0, _ := ret[0].(*domain.Courier)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -95,8 +95,22 @@ func (mr *MockCourierRepositoryMockRecorder) GetOneForDelivery(ctx interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOneForDelivery", reflect.TypeOf((*MockCourierRepository)(nil).GetOneForDelivery), ctx)
 }
 
+// ReleaseOneByOrderId mocks base method.
+func (m *MockCourierRepository) ReleaseOneByOrderId(ctx context.Context, orderId string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReleaseOneByOrderId", ctx, orderId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReleaseOneByOrderId indicates an expected call of ReleaseOneByOrderId.
+func (mr *MockCourierRepositoryMockRecorder) ReleaseOneByOrderId(ctx, orderId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReleaseOneByOrderId", reflect.TypeOf((*MockCourierRepository)(nil).ReleaseOneByOrderId), ctx, orderId)
+}
+
 // Update mocks base method.
-func (m *MockCourierRepository) Update(ctx context.Context, courier *model.Courier) error {
+func (m *MockCourierRepository) Update(ctx context.Context, courier *domain.Courier) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, courier)
 	ret0, _ := ret[0].(error)

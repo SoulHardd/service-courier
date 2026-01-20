@@ -2,7 +2,7 @@ package courier
 
 import (
 	"avito/internal/domain"
-	"avito/internal/handlers/courier/dto"
+	"avito/internal/handlers/http/courier/dto"
 	"avito/mocks/usecase"
 	"bytes"
 	"encoding/json"

@@ -1,9 +1,9 @@
 package delivery
 
 import (
-	"avito/internal/handlers"
-	"avito/internal/handlers/delivery/dto"
-	"avito/internal/handlers/httperror"
+	http2 "avito/internal/handlers/http"
+	dto2 "avito/internal/handlers/http/delivery/dto"
+	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
 )
@@ -17,41 +17,41 @@ func New(useCase deliveryUseCase) *DeliveryController {
 }
 
 func (c *DeliveryController) Create(w http.ResponseWriter, r *http.Request) {
-	var req dto.DeliveryCreateRequest
+	var req dto2.DeliveryCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		handlers.WriteErrorResponse(w, httperror.ErrInvalidJSON)
+		http2.WriteErrorResponse(w, httperror.ErrInvalidJSON)
 		return
 	}
 
-	domainDelivery := dto.ToModelCreate(&req)
+	domainDelivery := dto2.ToModelCreate(&req)
 	delivery, err := c.useCase.AssignDelivery(r.Context(), domainDelivery.OrderId)
 
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := dto.ToCreateResponse(*delivery)
+	response := dto2.ToCreateResponse(*delivery)
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }
 
 func (c *DeliveryController) Delete(w http.ResponseWriter, r *http.Request) {
-	var req dto.DeliveryDeleteRequest
+	var req dto2.DeliveryDeleteRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		handlers.WriteErrorResponse(w, httperror.ErrInvalidJSON)
+		http2.WriteErrorResponse(w, httperror.ErrInvalidJSON)
 		return
 	}
 
-	domainDelivery := dto.ToModelDelete(&req)
+	domainDelivery := dto2.ToModelDelete(&req)
 	delivery, err := c.useCase.UnassignDelivery(r.Context(), domainDelivery.OrderId)
 
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := dto.ToDeleteResponse(*delivery)
+	response := dto2.ToDeleteResponse(*delivery)
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }

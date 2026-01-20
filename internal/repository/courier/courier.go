@@ -201,3 +201,25 @@ func (r *CourierRepository) GetOneForDelivery(ctx context.Context) (*domain.Cour
 		TransportType: courier.TransportType,
 	}, nil
 }
+
+func (r *CourierRepository) ReleaseOneByOrderId(ctx context.Context, orderId string) error {
+	query, args, _ := squirrel.
+		Update("couriers").
+		Set("status", "available").
+		Where(squirrel.Eq{"status": "busy"}).
+		Where(squirrel.Eq{"id": squirrel.
+			Select("courier_id").
+			From("deliveries").
+			Where(squirrel.Eq{"order_id": orderId})}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	_, err := r.pool.Exec(ctx, query, args...)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrDeliveryNotFound
+		}
+		return fmt.Errorf("database error: %w", err)
+	}
+	return nil
+}

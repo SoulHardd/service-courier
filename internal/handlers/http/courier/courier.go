@@ -1,9 +1,9 @@
 package courier
 
 import (
-	"avito/internal/handlers"
-	"avito/internal/handlers/courier/dto"
-	"avito/internal/handlers/httperror"
+	http2 "avito/internal/handlers/http"
+	dto2 "avito/internal/handlers/http/courier/dto"
+	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -23,46 +23,46 @@ func (c *CourierController) Get(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		handlers.WriteErrorResponse(w, httperror.ErrInvalidCourierId)
+		http2.WriteErrorResponse(w, httperror.ErrInvalidCourierId)
 		return
 	}
 
 	Courier, err := c.useCase.GetCourier(r.Context(), id)
 
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := dto.ToCourierResponse(*Courier)
+	response := dto2.ToCourierResponse(*Courier)
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }
 
 func (c *CourierController) GetAll(w http.ResponseWriter, r *http.Request) {
 	Couriers, err := c.useCase.GetCouriers(r.Context())
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
-	response := dto.ToCourierResponses(Couriers)
+	response := dto2.ToCourierResponses(Couriers)
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }
 
 func (c *CourierController) Create(w http.ResponseWriter, r *http.Request) {
-	var req dto.CourierCreateRequest
+	var req dto2.CourierCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		handlers.WriteErrorResponse(w, httperror.ErrInvalidJSON)
+		http2.WriteErrorResponse(w, httperror.ErrInvalidJSON)
 		return
 	}
 
-	domainCourier := dto.ToModelCreate(&req)
+	domainCourier := dto2.ToModelCreate(&req)
 	id, err := c.useCase.CreateCourier(r.Context(), &domainCourier)
 
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
@@ -71,21 +71,21 @@ func (c *CourierController) Create(w http.ResponseWriter, r *http.Request) {
 		"message": "Courier created successfully",
 	}
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }
 
 func (c *CourierController) Update(w http.ResponseWriter, r *http.Request) {
-	var req dto.CourierUpdateRequest
+	var req dto2.CourierUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		handlers.WriteErrorResponse(w, httperror.ErrInvalidJSON)
+		http2.WriteErrorResponse(w, httperror.ErrInvalidJSON)
 		return
 	}
 
-	domainCourier := dto.ToModelUpdate(&req)
+	domainCourier := dto2.ToModelUpdate(&req)
 	err := c.useCase.UpdateCourier(r.Context(), &domainCourier)
 
 	if err != nil {
-		handlers.WriteErrorResponse(w, err)
+		http2.WriteErrorResponse(w, err)
 		return
 	}
 
@@ -93,5 +93,5 @@ func (c *CourierController) Update(w http.ResponseWriter, r *http.Request) {
 		"message": "Courier updated successfully",
 	}
 
-	handlers.WriteResponse(w, http.StatusOK, response)
+	http2.WriteResponse(w, http.StatusOK, response)
 }

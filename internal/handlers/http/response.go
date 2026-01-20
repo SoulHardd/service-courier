@@ -1,7 +1,7 @@
-package handlers
+package http
 
 import (
-	"avito/internal/handlers/httperror"
+	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
 )

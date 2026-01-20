@@ -2,9 +2,11 @@ package server
 
 import (
 	"avito/internal/config"
-	"avito/internal/handlers"
-	"avito/internal/handlers/courier"
-	"avito/internal/handlers/delivery"
+	http2 "avito/internal/handlers/http"
+	"avito/internal/handlers/http/courier"
+	"avito/internal/handlers/http/delivery"
+	"avito/internal/logger"
+	"avito/internal/middleware"
 	"errors"
 	"fmt"
 	"log"
@@ -19,10 +21,18 @@ type Server struct {
 	r       *chi.Mux
 	cfg     *config.ServerConfig
 	db      *pgxpool.Pool
+	lg      logger.Logger
 }
 
-func New(cfg *config.ServerConfig, pool *pgxpool.Pool, courier *courier.CourierController, delivery *delivery.DeliveryController) *Server {
+func New(
+	cfg *config.ServerConfig,
+	pool *pgxpool.Pool,
+	courier *courier.CourierController,
+	delivery *delivery.DeliveryController,
+	logger logger.Logger,
+) *Server {
 	r := chi.NewRouter()
+	r.Use(middleware.MetricsAndLogsMiddleware(logger))
 	s := &Server{
 		HttpSrv: &http.Server{
 			Addr:    fmt.Sprintf(":%d", cfg.Port),
@@ -31,6 +41,7 @@ func New(cfg *config.ServerConfig, pool *pgxpool.Pool, courier *courier.CourierC
 		r:   r,
 		cfg: cfg,
 		db:  pool,
+		lg:  logger,
 	}
 	s.setRoutes(courier, delivery)
 	return s
@@ -46,8 +57,8 @@ func (s *Server) ListenAndServe() {
 }
 
 func (s *Server) setRoutes(courier *courier.CourierController, delivery *delivery.DeliveryController) {
-	s.r.Get("/ping", handlers.Ping)
-	s.r.Head("/healthcheck", handlers.HealthCheck)
+	s.r.Get("/ping", http2.Ping)
+	s.r.Head("/healthcheck", http2.HealthCheck)
 	s.r.Get("/couriers", courier.GetAll)
 	s.r.Route("/courier", func(r chi.Router) {
 		r.Get("/{id}", courier.Get)
