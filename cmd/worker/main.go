@@ -33,7 +33,9 @@ func main() {
 	cfg := config.MustLoad()
 
 	zapLogger, _ := zap.NewProduction()
-	defer zapLogger.Sync()
+	defer func() {
+		_ = zapLogger.Sync()
+	}()
 	lg := logger.NewZapLogger(zapLogger)
 
 	pool := connections.InitPool(appCtx, cfg.DatabaseCfg)
@@ -52,9 +54,11 @@ func main() {
 		)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	o := pb.NewOrdersServiceClient(conn)
-	orderGateway := order.NewGateway(o)
+	orderGateway := order.NewGateway(o, cfg.GrpcCfg)
 
 	orderUseCase := changedUc.NewOrderUseCase(orderGateway, deliveryUseCase, courierUseCase)
 
@@ -93,7 +97,9 @@ func main() {
 		)
 		return
 	}
-	defer kafkaClient.Close()
+	defer func() {
+		_ = kafkaClient.Close()
+	}()
 
 	go func() {
 		for {

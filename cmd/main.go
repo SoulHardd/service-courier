@@ -6,6 +6,7 @@ import (
 	courierHandler "avito/internal/handlers/http/courier"
 	deliveryHandler "avito/internal/handlers/http/delivery"
 	"avito/internal/logger"
+	"avito/internal/pprof"
 	courierRepo "avito/internal/repository/courier"
 	deliveryRepo "avito/internal/repository/delivery"
 	"avito/internal/server"
@@ -43,21 +44,28 @@ func main() {
 	deliveryController := deliveryHandler.New(deliveryUseCase)
 
 	zapLogger, _ := zap.NewProduction()
-	defer zapLogger.Sync()
+	defer func() {
+		_ = zapLogger.Sync()
+	}()
 	lg := logger.NewZapLogger(zapLogger)
-	srv := server.New(cfg.ServerCfg, pool, courierController, deliveryController, lg)
+	srv := server.New(cfg.ServerCfg, pool, courierController, deliveryController, lg, cfg.RateLimiterCfg)
 
 	deliveryUseCase.StartMonitorDeliveries(appCtx, cfg.TimeCfg.DeliveryMonitorInterval)
 
 	conn, err := grpc.NewClient(cfg.GrpcCfg.OrderServiceGrpc, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect to gRPC server: %v", err)
+		log.Printf("Failed to connect to gRPC server: %v", err)
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	o := pb.NewOrdersServiceClient(conn)
-	orderGateway := order.NewGateway(o)
+	orderGateway := order.NewGateway(o, cfg.GrpcCfg)
 	orderWorker := worker.New(orderGateway, deliveryUseCase, cfg.TimeCfg.OrderWorkerInterval)
 	orderWorker.Run(appCtx)
+
+	pprofServer := pprof.New(":6060")
+	pprofServer.Run()
 
 	srv.ListenAndServe()
 

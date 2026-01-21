@@ -4,18 +4,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/go-playground/validator/v10"
+	validator "github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 	"github.com/spf13/pflag"
 )
 
 type Config struct {
-	ServerCfg   *ServerConfig
-	DatabaseCfg *DatabaseConfig
-	TimeCfg     *TimeConfig
-	GrpcCfg     *GrpcConfig
-	KafkaCfg    *KafkaConfig
+	ServerCfg      *ServerConfig
+	DatabaseCfg    *DatabaseConfig
+	TimeCfg        *TimeConfig
+	GrpcCfg        *GrpcConfig
+	KafkaCfg       *KafkaConfig
+	RateLimiterCfg *RateLimiterConfig
 }
 
 type ServerConfig struct {
@@ -42,7 +43,10 @@ type DatabaseConfig struct {
 }
 
 type GrpcConfig struct {
-	OrderServiceGrpc string `env:"ORDER_SERVICE_GRPC"`
+	OrderServiceGrpc string        `env:"ORDER_SERVICE_GRPC"`
+	MaxRetries       int           `env:"GRPC_MAX_RETRIES" env-default:"5"`
+	BaseRetryDelay   time.Duration `env:"GRPC_BASE_RETRY_DELAY" env-default:"100ms"`
+	DelayMultiplier  int           `env:"GRPC_DELAY_MULTIPLIER" env-default:"2"`
 }
 
 type KafkaConfig struct {
@@ -55,6 +59,11 @@ type KafkaConfig struct {
 	AutoCommitInterval time.Duration `env:"KAFKA_AUTO_COMMIT_INTERVAL" env-default:"1s"`
 }
 
+type RateLimiterConfig struct {
+	MaxTokens  float64 `env:"RATE_LIMITER_MAX_TOKENS" env-default:"5"`
+	RefillRate float64 `env:"RATE_LIMITER_REFILL_RATE" env-default:"5"`
+}
+
 func MustLoad() *Config {
 	var port int
 	pflag.IntVar(&port, "port", 0, "HTTP server port")
@@ -64,11 +73,12 @@ func MustLoad() *Config {
 		log.Printf("Failed to load .env file: %v", err)
 	}
 	cfg := &Config{
-		ServerCfg:   &ServerConfig{},
-		DatabaseCfg: &DatabaseConfig{},
-		TimeCfg:     &TimeConfig{},
-		GrpcCfg:     &GrpcConfig{},
-		KafkaCfg:    &KafkaConfig{},
+		ServerCfg:      &ServerConfig{},
+		DatabaseCfg:    &DatabaseConfig{},
+		TimeCfg:        &TimeConfig{},
+		GrpcCfg:        &GrpcConfig{},
+		KafkaCfg:       &KafkaConfig{},
+		RateLimiterCfg: &RateLimiterConfig{},
 	}
 
 	if err := cleanenv.ReadEnv(cfg.ServerCfg); err != nil {
@@ -85,6 +95,9 @@ func MustLoad() *Config {
 	}
 	if err := cleanenv.ReadEnv(cfg.KafkaCfg); err != nil {
 		log.Fatalf("Failed to load kafka config: %v", err)
+	}
+	if err := cleanenv.ReadEnv(cfg.RateLimiterCfg); err != nil {
+		log.Fatalf("Failed to load rate limiter config: %v", err)
 	}
 
 	if port != 0 {

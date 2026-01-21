@@ -22,6 +22,10 @@ func (z *ZapLogger) Fatal(msg string, fields ...Field) {
 	z.logger.Fatal(msg, toZapFields(fields)...)
 }
 
+func (z *ZapLogger) Warn(msg string, fields ...Field) {
+	z.logger.Warn(msg, toZapFields(fields)...)
+}
+
 func toZapFields(fields []Field) []zap.Field {
 	zf := make([]zap.Field, 0, len(fields))
 	for _, f := range fields {

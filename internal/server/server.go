@@ -7,12 +7,13 @@ import (
 	"avito/internal/handlers/http/delivery"
 	"avito/internal/logger"
 	"avito/internal/middleware"
+	"avito/internal/rateLimiter"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	chi "github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -30,9 +31,14 @@ func New(
 	courier *courier.CourierController,
 	delivery *delivery.DeliveryController,
 	logger logger.Logger,
+	rateLimiterCfg *config.RateLimiterConfig,
 ) *Server {
 	r := chi.NewRouter()
-	r.Use(middleware.MetricsAndLogsMiddleware(logger))
+	ipLimiter := rateLimiter.NewIPRateLimiter()
+	for _, mw := range middleware.NewMiddleware(logger, ipLimiter, rateLimiterCfg) {
+		r.Use(mw)
+	}
+
 	s := &Server{
 		HttpSrv: &http.Server{
 			Addr:    fmt.Sprintf(":%d", cfg.Port),

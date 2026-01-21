@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

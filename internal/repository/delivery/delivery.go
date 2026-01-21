@@ -9,7 +9,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
+	pgx "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -28,7 +28,9 @@ func (r *DeliveryRepository) Assign(ctx context.Context, orderId string, c *doma
 	if err != nil {
 		return nil, fmt.Errorf("error starting transaction: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		err = errors.Join(tx.Rollback(ctx))
+	}()
 
 	if err := validateUuid(orderId); err != nil {
 		if errors.Is(err, domain.ErrInvalidId) {
@@ -121,7 +123,9 @@ func (r *DeliveryRepository) Unassign(ctx context.Context, orderId string) (*dom
 	if err != nil {
 		return nil, fmt.Errorf("error starting transaction: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		err = errors.Join(tx.Rollback(ctx))
+	}()
 
 	if err := validateUuid(orderId); err != nil {
 		if errors.Is(err, domain.ErrInvalidId) {

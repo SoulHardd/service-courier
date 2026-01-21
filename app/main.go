@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -35,10 +36,14 @@ func simulateOperation() {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 
 	http.Handle("/metrics", promhttp.Handler())
-	go http.ListenAndServe(":2112", nil)
+	go func() {
+		err := http.ListenAndServe(":2112", nil)
+		if err != nil {
+			log.Fatalf("Metrics server error: %v", err)
+		}
+	}()
 
 	for {
 		simulateOperation()

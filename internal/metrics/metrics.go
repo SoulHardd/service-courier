@@ -19,4 +19,16 @@ var (
 		},
 		[]string{"path"},
 	)
+
+	RateLimitExceededTotal = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "rate_limit_exceeded_total",
+			Help: "Total rate limit exceeded by the API",
+		})
+
+	GatewayRetriesTotal = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "gateway_retries_total",
+			Help: "Total number of gateway retries",
+		})
 )
