@@ -1,9 +1,10 @@
 package worker
 
 import (
-	"avito/internal/domain"
 	"context"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type OrderGateway interface {

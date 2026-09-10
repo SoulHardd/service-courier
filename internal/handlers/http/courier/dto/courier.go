@@ -1,6 +1,6 @@
 package dto
 
-import "avito/internal/domain"
+import "github.com/SoulHardd/service-courier/internal/domain"
 
 type CourierResponse struct {
 	ID            int64                `json:"id"`

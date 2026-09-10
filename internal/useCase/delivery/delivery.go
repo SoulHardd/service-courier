@@ -1,13 +1,14 @@
 package delivery
 
 import (
-	"avito/internal/domain"
-	"avito/internal/factory"
-	"avito/internal/useCase/courier"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/factory"
+	"github.com/SoulHardd/service-courier/internal/useCase/courier"
 )
 
 type DeliveryUseCase struct {

@@ -5,8 +5,8 @@
 package repository
 
 import (
-	domain "avito/internal/domain"
 	context "context"
+	domain "github.com/SoulHardd/service-courier/internal/domain"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

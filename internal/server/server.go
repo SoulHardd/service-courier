@@ -1,17 +1,18 @@
 package server
 
 import (
-	"avito/internal/config"
-	http2 "avito/internal/handlers/http"
-	"avito/internal/handlers/http/courier"
-	"avito/internal/handlers/http/delivery"
-	"avito/internal/logger"
-	"avito/internal/middleware"
-	"avito/internal/rateLimiter"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/SoulHardd/service-courier/internal/config"
+	http2 "github.com/SoulHardd/service-courier/internal/handlers/http"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/courier"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/delivery"
+	"github.com/SoulHardd/service-courier/internal/logger"
+	"github.com/SoulHardd/service-courier/internal/middleware"
+	"github.com/SoulHardd/service-courier/internal/rateLimiter"
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

@@ -1,8 +1,9 @@
 package changed
 
 import (
-	model "avito/internal/domain"
 	"context"
+
+	model "github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type OrderUseCase interface {

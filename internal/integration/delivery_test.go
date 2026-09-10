@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"avito/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/domain"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"

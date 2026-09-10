@@ -1,12 +1,12 @@
 package delivery
 
 import (
-	"avito/internal/domain"
-	"avito/internal/handlers/http/delivery/dto"
-	"avito/mocks/usecase"
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/delivery/dto"
+	"github.com/SoulHardd/service-courier/mocks/usecase"
 	"net/http"
 	"net/http/httptest"
 	"testing"

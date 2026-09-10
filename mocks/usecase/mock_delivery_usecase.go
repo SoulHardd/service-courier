@@ -5,8 +5,8 @@
 package usecase
 
 import (
-	model "avito/internal/domain"
 	context "context"
+	model "github.com/SoulHardd/service-courier/internal/domain"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

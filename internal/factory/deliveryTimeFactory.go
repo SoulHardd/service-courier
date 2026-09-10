@@ -1,8 +1,9 @@
 package factory
 
 import (
-	"avito/internal/domain"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type DeliveryDeadline interface {

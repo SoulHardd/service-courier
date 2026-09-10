@@ -1,12 +1,13 @@
 package delivery
 
 import (
-	"avito/internal/domain"
-	"avito/mocks/repository"
 	"context"
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/mocks/repository"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

@@ -1,15 +1,16 @@
 package courier
 
 import (
-	"avito/internal/domain"
-	"avito/internal/handlers/http/courier/dto"
-	"avito/mocks/usecase"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/courier/dto"
+	"github.com/SoulHardd/service-courier/mocks/usecase"
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/golang/mock/gomock"

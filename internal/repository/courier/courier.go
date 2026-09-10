@@ -1,10 +1,11 @@
 package courier
 
 import (
-	"avito/internal/domain"
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 
 	"github.com/Masterminds/squirrel"
 	pgx "github.com/jackc/pgx/v5"

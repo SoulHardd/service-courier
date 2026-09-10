@@ -1,8 +1,9 @@
 package dto
 
 import (
-	"avito/internal/domain"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type DeliveryCreateRequest struct {

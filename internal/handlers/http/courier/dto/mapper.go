@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"avito/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 func ToCourierResponse(c domain.Courier) CourierResponse {

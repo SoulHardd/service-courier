@@ -1,12 +1,12 @@
 package order
 
 import (
-	"avito/internal/config"
-	"avito/internal/domain"
-	"avito/internal/metrics"
-	pb "avito/proto/order"
 	"context"
 	"fmt"
+	"github.com/SoulHardd/service-courier/internal/config"
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/metrics"
+	pb "github.com/SoulHardd/service-courier/proto/order"
 	"time"
 
 	"google.golang.org/grpc/codes"

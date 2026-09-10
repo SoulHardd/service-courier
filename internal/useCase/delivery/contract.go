@@ -2,9 +2,10 @@
 package delivery
 
 import (
-	"avito/internal/domain"
 	"context"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type DeliveryRepository interface {

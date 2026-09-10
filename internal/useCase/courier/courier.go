@@ -1,10 +1,11 @@
 package courier
 
 import (
-	"avito/internal/domain"
 	"context"
 	"errors"
 	"regexp"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type CourierUseCase struct {

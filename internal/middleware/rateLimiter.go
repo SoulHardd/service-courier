@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"avito/internal/config"
-	"avito/internal/logger"
-	"avito/internal/metrics"
-	"avito/internal/rateLimiter"
 	"net/http"
+
+	"github.com/SoulHardd/service-courier/internal/config"
+	"github.com/SoulHardd/service-courier/internal/logger"
+	"github.com/SoulHardd/service-courier/internal/metrics"
+	"github.com/SoulHardd/service-courier/internal/rateLimiter"
 )
 
 func RateLimitMiddleware(ipLimiter *rateLimiter.IPRateLimiter, log logger.Logger, cfg *config.RateLimiterConfig) func(http.Handler) http.Handler {

@@ -2,8 +2,9 @@
 package delivery
 
 import (
-	"avito/internal/domain"
 	"context"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type deliveryUseCase interface {

@@ -6,7 +6,7 @@ import (
 	"context"
 	"testing"
 
-	"avito/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/domain"
 
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"

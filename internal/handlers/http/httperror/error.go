@@ -1,7 +1,7 @@
 package httperror
 
 import (
-	"avito/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/domain"
 
 	"github.com/pkg/errors"
 )

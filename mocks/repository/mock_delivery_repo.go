@@ -5,8 +5,8 @@
 package repository
 
 import (
-	"avito/internal/domain"
 	context "context"
+	"github.com/SoulHardd/service-courier/internal/domain"
 	reflect "reflect"
 	time "time"
 

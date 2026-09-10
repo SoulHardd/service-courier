@@ -1,10 +1,11 @@
 package changed
 
 import (
-	model "avito/internal/domain"
 	"context"
 	"fmt"
 	"log"
+
+	model "github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type OrderUseCase struct {

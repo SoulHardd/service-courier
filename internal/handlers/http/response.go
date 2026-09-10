@@ -1,9 +1,10 @@
 package http
 
 import (
-	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
+
+	"github.com/SoulHardd/service-courier/internal/handlers/http/httperror"
 )
 
 func WriteResponse(w http.ResponseWriter, statusCode int, response interface{}) {

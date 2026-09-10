@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"avito/internal/config"
-	courierRepo "avito/internal/repository/courier"
-	deliveryRepo "avito/internal/repository/delivery"
-	courierUC "avito/internal/useCase/courier"
-	deliveryUC "avito/internal/useCase/delivery"
-	"avito/pkg/connections"
+	"github.com/SoulHardd/service-courier/internal/config"
+	courierRepo "github.com/SoulHardd/service-courier/internal/repository/courier"
+	deliveryRepo "github.com/SoulHardd/service-courier/internal/repository/delivery"
+	courierUC "github.com/SoulHardd/service-courier/internal/useCase/courier"
+	deliveryUC "github.com/SoulHardd/service-courier/internal/useCase/delivery"
+	"github.com/SoulHardd/service-courier/pkg/connections"
 
 	"testing"
 

@@ -1,9 +1,10 @@
 package changed
 
 import (
-	"avito/internal/domain"
 	"context"
 	"fmt"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type Handler interface {

@@ -1,8 +1,9 @@
 package courier
 
 import (
-	"avito/internal/domain"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 )
 
 type CourierDB struct {

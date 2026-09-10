@@ -1,11 +1,12 @@
 package delivery
 
 import (
-	"avito/internal/domain"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/domain"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"

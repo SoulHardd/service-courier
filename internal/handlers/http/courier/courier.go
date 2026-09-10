@@ -1,12 +1,13 @@
 package courier
 
 import (
-	http2 "avito/internal/handlers/http"
-	dto2 "avito/internal/handlers/http/courier/dto"
-	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	http2 "github.com/SoulHardd/service-courier/internal/handlers/http"
+	dto2 "github.com/SoulHardd/service-courier/internal/handlers/http/courier/dto"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/httperror"
 
 	chi "github.com/go-chi/chi/v5"
 )

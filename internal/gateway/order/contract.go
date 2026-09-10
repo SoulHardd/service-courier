@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "avito/proto/order"
+	pb "github.com/SoulHardd/service-courier/proto/order"
 )
 
 type order interface {

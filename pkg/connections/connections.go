@@ -1,11 +1,12 @@
 package connections
 
 import (
-	"avito/internal/config"
 	"context"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/SoulHardd/service-courier/internal/config"
 
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/jackc/pgx/v5/pgxpool"

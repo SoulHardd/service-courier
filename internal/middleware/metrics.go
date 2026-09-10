@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"avito/internal/logger"
 	"net/http"
 	"time"
 
-	"avito/internal/metrics"
+	"github.com/SoulHardd/service-courier/internal/logger"
+
+	"github.com/SoulHardd/service-courier/internal/metrics"
 
 	chi "github.com/go-chi/chi/v5"
 )

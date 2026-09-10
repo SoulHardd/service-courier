@@ -1,9 +1,9 @@
 package changed
 
 import (
-	"avito/internal/domain"
-	"avito/internal/handlers/queue/order/changed/dto"
 	"encoding/json"
+	"github.com/SoulHardd/service-courier/internal/domain"
+	"github.com/SoulHardd/service-courier/internal/handlers/queue/order/changed/dto"
 	"log"
 
 	"github.com/IBM/sarama"

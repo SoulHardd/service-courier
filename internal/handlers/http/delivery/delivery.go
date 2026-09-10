@@ -1,11 +1,12 @@
 package delivery
 
 import (
-	http2 "avito/internal/handlers/http"
-	dto2 "avito/internal/handlers/http/delivery/dto"
-	"avito/internal/handlers/http/httperror"
 	"encoding/json"
 	"net/http"
+
+	http2 "github.com/SoulHardd/service-courier/internal/handlers/http"
+	dto2 "github.com/SoulHardd/service-courier/internal/handlers/http/delivery/dto"
+	"github.com/SoulHardd/service-courier/internal/handlers/http/httperror"
 )
 
 type DeliveryController struct {
